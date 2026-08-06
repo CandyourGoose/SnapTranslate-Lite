@@ -2,6 +2,7 @@ from dataclasses import asdict, dataclass, replace
 import json
 import os
 from pathlib import Path
+import time
 
 from . import APP_VERSION
 from .domain import PopupContent, TranslationSource
@@ -97,4 +98,11 @@ class SettingsStore:
             json.dumps(payload, ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
-        temp.replace(self.path)
+        for attempt in range(5):
+            try:
+                os.replace(temp, self.path)
+                return
+            except OSError:
+                if attempt == 4:
+                    raise
+                time.sleep(0.01 * (attempt + 1))
