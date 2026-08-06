@@ -36,11 +36,6 @@ class SelectionCapture:
 
     def _capture_once(self) -> str:
         try:
-            snapshot = self._clipboard.hold_current()
-        except (OSError, RuntimeError, pyperclip.PyperclipException):
-            return ""
-
-        try:
             before = self._clipboard.sequence_number()
             self._keyboard.copy_selection()
             for _ in range(20):
@@ -49,9 +44,4 @@ class SelectionCapture:
                 self._sleep(0.03)
         except (OSError, RuntimeError, pyperclip.PyperclipException):
             return ""
-        finally:
-            try:
-                self._clipboard.restore(snapshot)
-            except (OSError, RuntimeError):
-                pass
         return ""

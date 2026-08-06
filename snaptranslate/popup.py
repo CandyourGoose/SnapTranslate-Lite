@@ -65,6 +65,13 @@ def panel_gradient(preset: str) -> tuple[str, str]:
     return PANEL_GRADIENTS.get(preset, PANEL_GRADIENTS["slate"])
 
 
+def tk_reference_scale(root) -> float:
+    try:
+        return max(0.25, float(root.winfo_fpixels("1i")) / 96.0)
+    except (AttributeError, tk.TclError, TypeError, ValueError):
+        return 1.0
+
+
 def _tk_fallback_snapshot(root) -> MonitorSnapshot:
     try:
         left = int(root.winfo_vrootx())
@@ -188,8 +195,10 @@ class PopupPresenter:
         window.deiconify()
         window.update_idletasks()
         window.update()
+        target_scale = toplevel_dpi_scale(window, fallback=snapshot.scale)
         metrics = popup_metrics(
-            toplevel_dpi_scale(window, fallback=snapshot.scale)
+            physical_scale=target_scale,
+            font_scale=target_scale / tk_reference_scale(self._root),
         )
 
         outer = tk.Frame(

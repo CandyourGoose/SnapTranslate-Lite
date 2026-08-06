@@ -20,12 +20,19 @@ class PopupMetrics:
     cursor_offset: tuple[int, int]
 
 
-def popup_metrics(scale: float) -> PopupMetrics:
-    scale = max(1.0, float(scale))
-    px = lambda value: max(1, round(value * scale))
+def popup_metrics(physical_scale: float, font_scale: float) -> PopupMetrics:
+    physical_scale = max(1.0, float(physical_scale))
+    font_scale = max(0.25, float(font_scale))
+
+    def px(value: int) -> int:
+        return max(1, round(value * physical_scale))
+
+    def font(value: int) -> int:
+        return max(1, round(value * font_scale))
+
     return PopupMetrics(
-        original_font=px(10),
-        translation_font=px(11),
+        original_font=font(10),
+        translation_font=font(11),
         padding_x=px(14),
         padding_top=px(10),
         padding_bottom=px(10),
